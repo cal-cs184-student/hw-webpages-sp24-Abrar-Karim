@@ -132,7 +132,7 @@
             around to be in the correct position (the barbell in the middle and the two weights on each side of the 
             barbell). Then I modified the fill argument to be black so it would stand out.
         </p>
-        <img src="robot.png" width="500px"/>
+        <img src="imgs/robot.png" width="500px"/>
     </section>
     <section id="task4">
         <h2>Task 4: Barycentric coordinates</h2>
@@ -147,14 +147,13 @@
                 <table style="width:100%">
                   <tr>
                     <td>
-                      <img src="imgs/barycentric_RGB.png" width="500px"/>
+                      <img src="imgs/Barycentric_RGB.png" width="500px"/>
                       <figcaption> This is a single triangle colored using barycentric coordinates. The top vertice has (1,0,0) RGB channel
                         the left one has (0,1,0) RGB channel and the right one has (0,0,1) RGB channel.   
                       </figcaption>
                     </td>
                     <td>
                         <img src="imgs/task-4-1.png" width="500px"/>
-                      <figcaption>Sample Rate = 4. Some supersampling reduces the jagged edges. </figcaption>
                     </td>
                   </tr>
                 </table>
@@ -175,7 +174,8 @@
             I had rescaled the normalized coordinates by the texture space and then found the nearest texel. 
             For bilinear sampling however, I had to find the four closest texels in the texture space and then 
             computed a 1D linear interpolation on first the four texels on the horizontal axis and then used 
-            those to create two vertical texels, which were then again LERPed to create the color value. </p>
+            those to create two vertical texels, which were then again LERPed to create the color value.   
+        </p>
             <div>
                 <table style="width:100%">
                   <tr>
@@ -185,7 +185,7 @@
                     </td>
                     <td>
                         <img src="imgs/task5-pic-1-2.png" width="500px"/>
-                      <figcaption>Bilinear, sample rate = 16</figcaption>
+                      <figcaption>Bilinear, sample rate = 1</figcaption>
                     </td>
                   </tr>
                   <br>
@@ -201,6 +201,12 @@
                   </tr>
                 </table>
               </div>
+              <p>
+                Here, we notice that the pixels in the middle of the inspector are for nearest-neighbor sample rate=1
+                and the pixels in the middle for bilinear sample rate = 1 are slightly different as the bilinear one is a bit 
+                bit more blurred/smooth. The largest differences between the two will occur when there is a slight difference in "elevation"
+                at the sample point since then the nearest-neighbor method will magnify the pixelation and will produce more jagged edges.
+              </p>
     </section>
     <section id="task6">
         <h2>Task 6: "Level sampling" with mipmaps for texture mapping</h2>
@@ -226,6 +232,31 @@
             prevent blurring and utilize anti-aliasing but since we have to store mipmaps and calculate additional 
             coordinates, it is very memory and CPU intensive. 
             </p>
+            <div>
+                <table style="width:100%">
+                  <tr>
+                    <td>
+                      <img src="imgs/task-6-L0-PN.png" width="500px"/>
+                      <figcaption>L_ZERO and P_NEAREST</figcaption>
+                    </td>
+                    <td>
+                        <img src="imgs/task-6-L0-PL.png" width="500px"/>
+                      <figcaption>L_ZERO and P_LINEAR</figcaption>
+                    </td>
+                  </tr>
+                  <br>
+                  <tr>
+                    <td>
+                        <img src="imgs/task-6-LN-PN.png" width="500px"/>
+                      <figcaption>L_NEAREST and P_NEAREST</figcaption>
+                    </td>
+                    <td>
+                        <img src="imgs/task-6-LN-PL.png" width="500px"/>
+                      <figcaption>L_NEAREST and P_LINEAR</figcaption>
+                    </td>
+                  </tr>
+                </table>
+              </div>
     </section>
 </body>
 </html>
