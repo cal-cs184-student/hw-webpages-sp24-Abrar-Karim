@@ -77,7 +77,7 @@
 			within the bounding box of the triangle because we used the minimum and maximum of the coordinates, so we were not 
 			going through every single coordinate.
 		</p>
-		<img src="hw1/imgs/task-1-pic"/>
+		<img src="imgs/task-1-pic"/>
     </section>
     <section id="task2">
         <h2>Task 2: Antialiasing by Supersampling</h2>
@@ -117,7 +117,7 @@
                 </td>
                 <td>
                     <img src="imgs/task-2-pic4.png" width="500px"/>
-                  <figcaption><b>Figure 2.1d:</b> Sample Rate = 16.</figcaption>
+                  <figcaption>Sample Rate = 16. The highest sample rate reduces most of the jagged edges</figcaption>
                 </td>
               </tr>
             </table>
@@ -132,6 +132,7 @@
             around to be in the correct position (the barbell in the middle and the two weights on each side of the 
             barbell). Then I modified the fill argument to be black so it would stand out.
         </p>
+        <img src="robot.png" width="500px"/>
     </section>
     <section id="task4">
         <h2>Task 4: Barycentric coordinates</h2>
@@ -139,7 +140,25 @@
             and gamma. These indicate how close a given point is to a vertex of a triangle. The three reference values 
             are then used to calculate a weighted sum for each vertex color, which is then used to assign the current 
             pixel color. This is really useful for interpolation as it allows us to smoothly assign color values to a 
-            triangle, so it blends in really well (kind of like a gradient)</p>
+            triangle, so it blends in really well (kind of like a gradient). In the triangle below, we can see that each 
+            end vertice has either red, green or blue and as we move into the triangle, the colors seem to get interpolated 
+             and blend in together. </p>
+            <div>
+                <table style="width:100%">
+                  <tr>
+                    <td>
+                      <img src="imgs/barycentric_RGB.png" width="500px"/>
+                      <figcaption> This is a single triangle colored using barycentric coordinates. The top vertice has (1,0,0) RGB channel
+                        the left one has (0,1,0) RGB channel and the right one has (0,0,1) RGB channel.   
+                      </figcaption>
+                    </td>
+                    <td>
+                        <img src="imgs/task-4-1.png" width="500px"/>
+                      <figcaption>Sample Rate = 4. Some supersampling reduces the jagged edges. </figcaption>
+                    </td>
+                  </tr>
+                </table>
+            </div>
     </section>
     <section id="task5">
         <h2>Task 5: "Pixel sampling" for texture mapping</h2>
@@ -157,6 +176,31 @@
             For bilinear sampling however, I had to find the four closest texels in the texture space and then 
             computed a 1D linear interpolation on first the four texels on the horizontal axis and then used 
             those to create two vertical texels, which were then again LERPed to create the color value. </p>
+            <div>
+                <table style="width:100%">
+                  <tr>
+                    <td>
+                      <img src="imgs/task5-pic-1-1.png" width="500px"/>
+                      <figcaption>Nearest-Neighbor, sample rate = 1</figcaption>
+                    </td>
+                    <td>
+                        <img src="imgs/task5-pic-1-2.png" width="500px"/>
+                      <figcaption>Bilinear, sample rate = 16</figcaption>
+                    </td>
+                  </tr>
+                  <br>
+                  <tr>
+                    <td>
+                        <img src="imgs/task5-pic-2-1.png" width="500px"/>
+                      <figcaption>Nearest-Neighbor, sample rate = 16</figcaption>
+                    </td>
+                    <td>
+                        <img src="imgs/task5-pic-2-2.png" width="500px"/>
+                      <figcaption>Bilinear, sample rate = 16.</figcaption>
+                    </td>
+                  </tr>
+                </table>
+              </div>
     </section>
     <section id="task6">
         <h2>Task 6: "Level sampling" with mipmaps for texture mapping</h2>
