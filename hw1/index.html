@@ -2,7 +2,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project Title</title>
+    <title>Homework 1: Rasterizer</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -37,39 +37,116 @@
 </head>
 <body>
     <header>
-        <h1>Project Title</h1>
+        <h1>Homework 1: Rasterizer</h1>
     </header>
     <nav>
-        <a href="#task1">Task 1</a> |
+        <a href="#task1">Task 1</a> |	
         <a href="#task2">Task 2</a> |
         <a href="#task3">Task 3</a> |
         <a href="#task4">Task 4</a> |
         <a href="#task5">Task 5</a> |
         <a href="#task6">Task 6</a>
     </nav>
+    <section id="Overview">
+    	<h2> Overview:</h2>
+        <p>
+        	In this project, we had to implement a rasterizer, which is a program that renders images from svg files with the main building block being a triangle. Through this project, there were three main functionalites that had to be implemented: Supersampling, Barycentric Coordinate Interpolation, and Texture mapping. This write up will present the implementation of each functionality as well as the results that demostracte how it improves rendering through its individual features.
+        </p>
+    </section>
     <section id="task1">
         <h2>Task 1: Drawing Single-Color Triangles</h2>
-        <p>This section discusses the implementation of drawing single-color triangles.</p>
+        <p>
+			For this task, I rasterized triangles. My first attempt was pretty successful where I took the maximum
+			and minimum x-coordinate and y-coordinate. Then I created a a for loop that will go through each x and y point
+			and see if it is within the triangle. This verification of inside the triangle was a little confused as my first
+			attempt was to code up the triangulation myself, but through some digging, I was able to find a method called 
+			"inside" within the triangulation.cpp file, which I utilizied. If the point was inside the triangle, then I 
+			called fill_pixel to draw it in. However, this was with the assumption that the triangle winding was counter 
+			clockwise, but this was easily fixed by using the Right-Hand rule (using a cross product between vectors)
+			to determine winding and then doing any swaps if needed. This method is no worse than one that checks each sample
+			within the bounding box of the triangle because we used the minimum and maximum of the coordinates, so we were not 
+			going through every single coordinate.
+		</p>
+		<img src="imgs/task1-basic-task4.png"/>
     </section>
     <section id="task2">
         <h2>Task 2: Antialiasing by Supersampling</h2>
-        <p>This section explores antialiasing techniques using supersampling.</p>
+        <p>In this part of the homework, we had to improve our method in the previous task by adding in supersampling. 
+            Supersampling is when we sample multiple times per pixel and the fraction of the supersamples within the 
+            triangle will help to produce a smoother edge, which is basically anti-aliasing. This is very useful 
+            because it removes some of the jagged edges that get produced by “blending” it within its surrounding 
+            pixels so it is more visually appealing. The process of how this was done was by first adding the 
+            pixel (x,y) coordinates and the subpixel (x,y) coordinates and then dividing it by the supersampling 
+            rate (which is given to us through the constructor). This allows us to divide up each pixel into subpixels 
+            and then create the final color which is the pixel’s original color multiplied by the sub-pixel colors. 
+            This was done by adding in a second nested for loop for each subpixel and then checking if that subpixel is 
+            within the triangle, and if so then we modify our sample_buffer array. The index for our sample_buffer array 
+            also had to be modified to include the sample_rate since now we are trying to modify a specific element 
+            rather than a position (since we might end up coloring pixels near the edge of the triangle). Another 
+            modification to the rasterizer pipeline that was required was the change to the function 
+            resolve_to_framebuffer() as that is necessary for making sure that the averaged supersamples were drawn 
+            into the frame buffer.
+        </p>
     </section>
     <section id="task3">
         <h2>Task 3: Transforms</h2>
-        <p>This section covers the application of transforms in computer graphics.</p>
+        <p>For this part of the homework, I thought that cubeman looked a little skinny so I decided to buff him up 
+            by giving him a barbell to work out with! This was done by adding in three extra rectangles, one that was 
+            scaled to be really long and reduced width (this is the barbell), and then two that had its width scaled 
+            up (these are the two weights). Then using the translate function I had implemented, I had moved them 
+            around to be in the correct position (the barbell in the middle and the two weights on each side of the 
+            barbell). Then I modified the fill argument to be black so it would stand out.
+        </p>
     </section>
     <section id="task4">
         <h2>Task 4: Barycentric coordinates</h2>
-        <p>This section explains the concept and usage of barycentric coordinates.</p>
+        <p>Barycentric coordinates are a coordinate system that is created using three reference values, alpha, beta 
+            and gamma. These indicate how close a given point is to a vertex of a triangle. The three reference values 
+            are then used to calculate a weighted sum for each vertex color, which is then used to assign the current 
+            pixel color. This is really useful for interpolation as it allows us to smoothly assign color values to a 
+            triangle, so it blends in really well (kind of like a gradient)</p>
     </section>
     <section id="task5">
         <h2>Task 5: "Pixel sampling" for texture mapping</h2>
-        <p>This section discusses pixel sampling techniques for texture mapping.</p>
+        <p>Pixel sampling is using specific pixels from an image to represent the whole image in a lower resolution, 
+            and its often used when going from 3D to 2D because based on the location of a texture, that texture on an 
+            object can appear differently, such as in 3D games. Thus every time an object is moved, it can be hard to 
+            have to constantly redraw the texture, so we will take advantage of the texture space to map a texture 
+            onto the surface of the screen. However, the map between screen and texture can be non-linear and it can 
+            be difficult to identify which pixel to use. To compute this, we can use barycentric coordinates and 
+            then scale it up to the texture coordinate to pick the correct color. This is done through two pixel 
+            sampling methods: nearest-neighbor sampling and bilinear sampling. The nearest sampling method takes 
+            the closest texture pixel while bilinear sampling will take the four colors of the subpixel and takes 
+            the average utilizing the alpha, beta and gamma weights. For implementing nearest-neighbor sampling, 
+            I had rescaled the normalized coordinates by the texture space and then found the nearest texel. 
+            For bilinear sampling however, I had to find the four closest texels in the texture space and then 
+            computed a 1D linear interpolation on first the four texels on the horizontal axis and then used 
+            those to create two vertical texels, which were then again LERPed to create the color value. </p>
     </section>
     <section id="task6">
         <h2>Task 6: "Level sampling" with mipmaps for texture mapping</h2>
-        <p>This section explores level sampling using mipmaps for texture mapping.</p>
+        <p>Based on the image, trying to sample high resolution images can cause aliasing when texture is far away in 
+            terms of perspective. But trying to fix this through using downsampling can cause the opposite to occur 
+            where things more upfront get blurred. To alleviate this, we can use level sampling, where we convert a 
+            2d image into a 3-dimensional axis by using different levels, where higher levels are used for far away 
+            objects. This is done through using barycentric coordinates, and a mipmap. A mipmap is a collection of 
+            downsampled textures which can be used to display things on the screen. I implemented level sampling 
+            for texture mapping by first trying to find the correct mipmap level. This was done by first calculating 
+            the correct (du/dx, dv/dx), (du/dy, du/dy) coordinates as these values are used to find the level, and 
+            they were found by using barycentric coordinates for (x,y), (x + 1, y) and (x, y + 1) coordinates. 
+            Then we find the difference in the vectors and then scale it up to match the full-resolution texture 
+            image, otherwise it will be very blurry. 
+            With so many different sampling techniques (such as supersampling, pixel sampling and level sampling), 
+            they all have pros and cons when it comes to speed, memory usage, and antialiasing power. 
+            For supersampling, it collects a lot of samples per pixel, which is useful for smoothing things out in 
+            terms of aliasing but it is very slow as it can be exponential runtime and also take up a lot of memory 
+            to store all the samples. Pixel sampling and level sampling are used for texture mapping,  
+            Using bi-linear sampling is definitely CPU intensive as it uses four pixels around the sampling point, 
+            per each sampling point so it can also take a while as well as take up memory, but it is definitely 
+            smoother than the nearest-neighbor since we have more sample points to use. Level sampling allows to 
+            prevent blurring and utilize anti-aliasing but since we have to store mipmaps and calculate additional 
+            coordinates, it is very memory and CPU intensive. 
+            </p>
     </section>
 </body>
 </html>
