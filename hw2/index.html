@@ -1,7 +1,96 @@
-<html>
-	<head>
-	</head>
-	<body>
-		Homework 2 index.html here
-	</body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Title</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+        }
+        nav {
+            background-color: #444;
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+        }
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            padding: 5px 10px;
+        }
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        nav ul ul {
+            display: none;
+            position: absolute;
+            background-color: #555;
+            padding: 0;
+        }
+        nav ul li:hover ul {
+            display: block;
+        }
+        nav ul ul li {
+            display: block;
+        }
+        section {
+            padding: 20px;
+        }
+        h2 {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Project Title</h1>
+    </header>
+    <nav>
+        <ul>
+            <li><a href="#section1">Section I: Bezier Curves and Surfaces</a>
+                <ul>
+                    <li><a href="#part1">Part 1: Bezier Curves with 1D de Casteljau Subdivision</a></li>
+                    <li><a href="#part2">Part 2: Bezier Surfaces with Separable 1D de Casteljau</a></li>
+                </ul>
+            </li>
+            <li><a href="#section2">Triangle Meshes and Half-Edge Data Structure</a>
+                <ul>
+                    <li><a href="#part3">Part 3: Area-Weighted Vertex Normals</a></li>
+                    <li><a href="#part4">Part 4: Edge Flip</a></li>
+                    <li><a href="#part5">Part 5: Edge Split</a></li>
+                    <li><a href="#part6">Part 6: Loop Subdivision for Mesh Upsampling</a></li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+    <section id="section1">
+        <h2>Section I: Bezier Curves and Surfaces</h2>
+        <h3 id="part1">Part 1: Bezier Curves with 1D de Casteljau Subdivision</h3>
+        <p>This part discusses the implementation of Bezier curves using 1D de Casteljau Subdivision.</p>
+        <h3 id="part2">Part 2: Bezier Surfaces with Separable 1D de Casteljau</h3>
+        <p>This part explores Bezier surfaces using Separable 1D de Casteljau Subdivision.</p>
+    </section>
+    <section id="section2">
+        <h2>Triangle Meshes and Half-Edge Data Structure</h2>
+        <h3 id="part3">Part 3: Area-Weighted Vertex Normals</h3>
+        <p>This part covers the computation of area-weighted vertex normals for triangle meshes.</p>
+        <h3 id="part4">Part 4: Edge Flip</h3>
+        <p>This part explains the edge flip operation in the context of a half-edge data structure.</p>
+        <h3 id="part5">Part 5: Edge Split</h3>
+        <p>This part discusses the edge split operation for refining triangle meshes.</p>
+        <h3 id="part6">Part 6: Loop Subdivision for Mesh Upsampling</h3>
+        <p>This part explores Loop Subdivision as a technique for mesh upsampling.</p>
+    </section>
+</body>
 </html>
