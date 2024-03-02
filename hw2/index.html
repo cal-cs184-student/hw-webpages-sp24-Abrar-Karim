@@ -57,40 +57,242 @@
         <h1>Project Title</h1>
     </header>
     <nav>
-        <ul>
-            <li><a href="#section1">Section I: Bezier Curves and Surfaces</a>
-                <ul>
-                    <li><a href="#part1">Part 1: Bezier Curves with 1D de Casteljau Subdivision</a></li>
-                    <li><a href="#part2">Part 2: Bezier Surfaces with Separable 1D de Casteljau</a></li>
-                </ul>
-            </li>
-            <li><a href="#section2">Triangle Meshes and Half-Edge Data Structure</a>
-                <ul>
-                    <li><a href="#part3">Part 3: Area-Weighted Vertex Normals</a></li>
-                    <li><a href="#part4">Part 4: Edge Flip</a></li>
-                    <li><a href="#part5">Part 5: Edge Split</a></li>
-                    <li><a href="#part6">Part 6: Loop Subdivision for Mesh Upsampling</a></li>
-                </ul>
-            </li>
-        </ul>
+        <a href="#task1">Part 1</a> |	
+        <a href="#task2">Part 2</a> |
+        <a href="#task3">Part 3</a> |
+        <a href="#task4">Part 4</a> |
+        <a href="#task5">Part 5</a> |
+        <a href="#task6">Part 6</a>
     </nav>
+	<section id="Overview">
+    	<h2> Overview:</h2>
+        <p>
+        	In this project, I had implemented functions that used sets of points to manipulates them to create
+			Bezier curves, and then converting those curves to surfaces utilizing de Casteljau's algorithm. I had 
+			also learned how to smooth meshes, flip and split edges of meshes and then use loop subdivision to upsample 
+			those meshes to make it look higher res. This project used a lot of pointers and through having to use them
+			I learned a lot about pointer manipulation as well.
+        </p>
     <section id="section1">
         <h2>Section I: Bezier Curves and Surfaces</h2>
+
         <h3 id="part1">Part 1: Bezier Curves with 1D de Casteljau Subdivision</h3>
-        <p>This part discusses the implementation of Bezier curves using 1D de Casteljau Subdivision.</p>
+        <p>The main implementation of this function was to create de Casteljau's algorithm, a recursive algorithm used to evaluate 
+            the polynomials used to represent Bezier Curves. Using n control points (the points used to define the Bezier Curve) and 
+            a parameter t (which is used to evaluate the curve), we can utilize linear interpolation to compute n - 1 points, and 
+            then keep calling this function to eventually come to a single point that lies on the Bezier curve. The parameter t gives 
+            us information about where on the curve the point is, so if we have points x0 and x1, when t is 0, the point is on x0, 
+            when t is 0.5, it would be in the middle between x0 and x1, and when t is 1, the point would be on x1. I was able to 
+            implement this function by looping through elements at index 0 to index n-1, and at each index, multiply that point 
+            by (1 - t), and at index + 1, multiply that point by t and then add those two together and place in a new array. 
+        </p>
+        <div>
+            <table style="width:100%">
+              <tr>
+                <td>
+                  <img src="imgs/hw2-part1-step1.png" align:middle width="500px"/>
+                  <figcaption text-align:middle>Step1</figcaption>
+                </td>
+                <td>
+                    <img src="imgs/hw2-part1-step2.png" align:middle width="500px"/>
+                    <figcaption text-align:middle>Step2</figcaption>
+                </td>
+              </tr>
+              <br>
+              <tr>
+                <td>
+                  <img src="imgs/hw2-part1-step3.png" align:middle width="500px"/>
+                  <figcaption text-align:middle>Step3</figcaption>
+                </td>
+                <td>
+                    <img src="imgs/hw2-part1-step4.png" align:middle width="500px"/>
+                    <figcaption text-align:middle>Step4</figcaption>
+                </td>
+              </tr>
+              <br>
+              <tr>
+                <td>
+                  <img src="imgs/hw2-part1-step5.png" align:middle width="500px"/>
+                  <figcaption text-align:middle>Step5</figcaption>
+                </td>
+                <td>
+                    <img src="imgs/hw2-part1-step6.png" align:middle width="500px"/>
+                    <figcaption text-align:middle>Step6</figcaption>
+                </td>
+              </tr>
+              <br>
+              <tr>
+                <td>
+                  <img src="imgs/hw2-part1-step7.png" align:middle width="500px"/>
+                  <figcaption text-align:middle>Step7</figcaption>
+                </td>
+                <td>
+                    <img src="imgs/hw2-part1-step8.png" align:middle width="500px"/>
+                    <figcaption text-align:middle>Step8</figcaption>
+                </td>
+              </tr>
+            </table>
+          </div>
         <h3 id="part2">Part 2: Bezier Surfaces with Separable 1D de Casteljau</h3>
-        <p>This part explores Bezier surfaces using Separable 1D de Casteljau Subdivision.</p>
+        <p>In the previous part, I had implemented de Casteljau’s algorithm but primarily to define a Bezier Curve. 
+            In this part, I had to use that function and extend it to evaluate Bezier surfaces. This was done by using 
+            the NxN control points given to us as a class variable. The way to extend the algorithm to Bezier surfaces 
+            is by taking each of the n rows and interpreting them as a Bezer curve in the u dimension, then interpolating 
+            those values in the second dimension v. Following that logic, I did so by taking each row of the NxN control point, 
+            defined by the parameter u, and computing the final, single-point Pi on this Bezier curve at the parameter u. 
+            This was done by making repeated calls to the BezierPatch::evaluate1D(...) function, which takes in a row of 
+            points and interpolates to a final point. So in total, there would be N of these points to represent the Bezier 
+            curves. Then, we make a final call to BezierPatch::evaluate1D(...) and pass in those u points to be evaluated at 
+            the v dimension.
+        </p>
+        <div>
+            <table style="width:100%">
+              <tr>
+                <td>
+                  <img src="imgs/hw2-part2-1.png" align:middle width="500px"/>
+                  <figcaption text-align:middle></figcaption>
+                </td>
+              </tr>
+            </table>
+        </div>
     </section>
     <section id="section2">
         <h2>Triangle Meshes and Half-Edge Data Structure</h2>
+
         <h3 id="part3">Part 3: Area-Weighted Vertex Normals</h3>
-        <p>This part covers the computation of area-weighted vertex normals for triangle meshes.</p>
+        <p>In this part, I had to calculate the area-weighted normal vector at a specific vertex. 
+            This allows us to provide better shading for surfaces that are smooth rather than flat shading. 
+            At each vertex, we have half-edges, which allows us to be able to iterate through each face of the 
+            vertex then for each face I was able to weigh its normal by its area, and then get the overall normal 
+            of the vertex, I normalize the sum of all the area-weighted normals. Since each face is a triangle, I was 
+            able to implement this logic by finding each vertex of the triangle by calling vertex()->position, saving 
+            each vertex of the triangle, computing the cross product of each face, and then adding that to our cumulative face. 
+            When we have gone through all the faces, then we can just call normalize() on our cumulative vector and then return that.
+        </p>
+        <div>
+            <table style="width:100%">
+              <tr>
+                <td>
+                  <img src="imgs/hw2-part3-1.png" align:middle width="500px"/>
+                  <figcaption text-align:middle>Before shading (default). Look at the bottom left of the teapot and see how you can see rectangles</figcaption>
+                </td>
+                <td>
+                    <img src="imgs/hw2-part3-2.png" align:middle width="500px"/>
+                    <figcaption text-align:middle>After shading (Phong). Look at the bottom left of the teapot and see how it smooths out</figcaption>
+                </td>
+              </tr>
+            </table>
+        </div>
         <h3 id="part4">Part 4: Edge Flip</h3>
-        <p>This part explains the edge flip operation in the context of a half-edge data structure.</p>
+        <p>In this part, I had to “flip” an edge, which is basically taking a pair of triangles and creating a new pair of triangles. 
+            For example, (this example is taken from the project spec at: https://cs184.eecs.berkeley.edu/sp24/docs/hw2-spec#p4), 
+            if we have a pair of triangles (a, b, c) and (c, b, d), “flipping” the edge would cause a new pair of triangle to be 
+            created namely, (a, d, c) and (a, b, d). 
+            To implement this function, I had to use the Half-Edge data structure, and then reassign all the necessary pointers 
+            so the edges get flipped. Using the recommended steps, I first tried out the paper approach where I drew out a simple 
+            mesh, such as the example above, and tried to write down the list of all the elements. But trying to write it all out 
+            turned out to be difficult because it was hard to keep track of them all but going through Edstem, 
+            someone (https://edstem.org/us/courses/50480/discussion/4339350?comment=10286438) had linked this pdf: http://15462.courses.cs.cmu.edu/fall2015content/misc/HalfedgeEdgeOpImplementationGuide.pdf 
+            which make the outline simple and easy to understand. Utilizing the step-by-step process and understanding which points 
+            should be reassigned to which one was paramount to being able to complete this part without requiring heavy debugging. 
+            After I had got it to work, I started to reduce the number of total pointers I had made so the file would not be as large.
+            </p>
+            <div>
+                <table style="width:100%">
+                  <tr>
+                    <td>
+                      <img src="imgs/hw2-part4-1.png" align:middle width="500px"/>
+                      <figcaption text-align:middle>Before flipping edges.</figcaption>
+                    </td>
+                    <td>
+                        <img src="imgs/hw2-part4-2.png" align:middle width="500px"/>
+                        <figcaption text-align:middle>After flipping edges.</figcaption>
+                    </td>
+                  </tr>
+                </table>
+            </div>
         <h3 id="part5">Part 5: Edge Split</h3>
-        <p>This part discusses the edge split operation for refining triangle meshes.</p>
+        <p>For this part, I tried doing the similar steps as part 4, where I had to make use of the Half-Edge data structure. 
+            However, since this part required the creation of a new vertex, that meant I had to make 3 new edges, 2 new faces, 
+            and 6 new half edges as well. Since this part also required heavy usage of pointers, I decided to utilize the diagram 
+            from the pdf linked in part 4 and then tried to see how the pointers would change after splitting an edge. 
+            Since this required adding in new elements, trying to figure out where every new element would go and how current 
+            elements would change was difficult. However, creating new references to every single pointer and making sure 
+            they were labeled correctly helped out a lot when trying to implement this function. After I was able to implement 
+            it correctly, to make sure the file didn’t get too large, I reduced the number of total pointers I used.
+        </p>
+        <div>
+            <table style="width:100%">
+              <tr>
+                <td>
+                  <img src="imgs/hw2-part5-1.png" align:middle width="500px"/>
+                  <figcaption text-align:middle>Before any flipping or splitting.</figcaption>
+                </td>
+                <td>
+                    <img src="imgs/hw2-part5-2.png" align:middle width="500px"/>
+                    <figcaption text-align:middle>After splitting edges.</figcaption>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                    <img src="imgs/hw2-part5-3.png" align:middle width="500px"/>
+                    <figcaption text-align:middle>After flipping and splitting edges.</figcaption>
+                </td>
+              </tr>
+            </table>
+        </div>
         <h3 id="part6">Part 6: Loop Subdivision for Mesh Upsampling</h3>
-        <p>This part explores Loop Subdivision as a technique for mesh upsampling.</p>
+        <p>In order to implement this part, I had to first loop through all the vertices and edges, and make them as not new to make 
+          sure that I had a mesh that was not new at all. Then I looped through all the vertices and got each vertice's degrees so I 
+          could compute new positions for all the vertices in the input mesh and then mark each vertex as being part of the original mesh
+          so when we subdivide and create new vertex, we know which one is new and not. I was able to update the position by 
+          ((1 - n * u) * original_position + u * original_neighbor_position_sum) where n is the vertex degree and u = 3/16 if n = 3 and 
+          3/(8n) otherwise. After doing that, I computed the new edge positions by looping through each edge. Then I had to split every 
+          edge in the mesh but only if their vertices were old so we would not split any new edges. Then, I went through the edges again
+          and flipped the edges if they were connected to a new vertex and an old vertex and if the edge was new. Then lastly, I updated
+          all the vertex position to the position stored in the Vertex::newPosition variable. Trying to debug this was pretty difficult
+          since there were two other functions that could be erroring so it took a lot of trial and error and making sure every function
+          was working as intended.</p>
+          <p>
+            After loop subdivision, sharp corners and edges are gradually lessened and also this could be reduced by pre-splitting some edges
+            since that produces a sharper image. 
+          </p>
+          <div>
+            <table style="width:100%">
+              <tr>
+                <td>
+                  <img src="imgs/hw2-part6-1.png" align:middle width="500px"/>
+                  <figcaption text-align:middle>Torus with no upsample</figcaption>
+                </td>
+                <td>
+                    <img src="imgs/hw2-part6-2.png" align:middle width="500px"/>
+                    <figcaption text-align:middle>Torus with first upsample</figcaption>
+                </td>
+              </tr>
+              <br>
+              <tr>
+                <td>
+                  <img src="imgs/hw2-part6-3.png" align:middle width="500px"/>
+                  <figcaption text-align:middle>Torus with second upsample</figcaption>
+                </td>
+                <td>
+                    <img src="imgs/hw2-part6-4.png" align:middle width="500px"/>
+                    <figcaption text-align:middle>Torus with third upsample</figcaption>
+                </td>
+              </tr>
+              <br>
+              <tr>
+                <td>
+                  <img src="imgs/hw2-part6-5.png" align:middle width="500px"/>
+                  <figcaption text-align:middle>Torus with fourth upsample</figcaption>
+                </td>
+                <td>
+                    <img src="imgs/hw2-part6-6.png" align:middle width="500px"/>
+                    <figcaption text-align:middle>Torus with fifth upsample</figcaption>
+                </td>
+              </tr>
+            </table>
+          </div>
     </section>
 </body>
 </html>
