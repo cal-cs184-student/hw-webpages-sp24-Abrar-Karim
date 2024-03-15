@@ -429,6 +429,85 @@
 				  </p>
 				  <div class ="ribbon">For CBbunny.dae, compare rendered views with max_ray_depth set to 0, 1, 2, 3, 4, and 5(the -m flag). Use 1024 samples per pixel.</div>
 
+				  <div>
+					<table style="width:100%">
+					  <tr>
+						<td>
+						  <img src="imgs/hw3-part4-4-0.png" align:middle width="500px"/>
+						  <figcaption text-align:middle>Rendering of bunny.dae with max_ray_depth = 0, using 1024 samples per pixel.</figcaption>
+						</td>
+						<td>
+							<img src="imgs/hw3-part4-4-1.png" align:middle width="500px"/>
+							<figcaption text-align:middle>Rendering of bunny.dae with max_ray_depth = 1 using 1024 samples per pixel. </figcaption>
+						</td>
+					  </tr>
+					  <br>
+					  <tr>
+						<td>
+						  <img src="imgs/hw3-part4-4-2.png" align:middle width="500px"/>
+						  <figcaption text-align:middle>Rendering of bunny.dae with max_ray_depth = 2 using 1024 samples per pixel.</figcaption>
+						</td>
+						<td>
+							<img src="imgs/hw3-part4-4-3.png" align:middle width="500px"/>
+							<figcaption text-align:middle>Rendering of bunny.dae with max_ray_depth = 3 using 1024 samples per pixel.</figcaption>
+						</td>
+					  </tr>
+					  <br>
+					  <tr>
+						<td>
+						  <img src="imgs/hw3-part4-4-4.png" align:middle width="500px"/>
+						  <figcaption text-align:middle>Rendering of bunny.dae with max_ray_depth = 4 using 1024 samples per pixel.</figcaption>
+						</td>
+						<td>
+							<img src="imgs/hw3-part4-3-5.png" align:middle width="500px"/>
+							<figcaption text-align:middle>Rendering of bunny.dae with max_ray_depth = 5 using 1024 samples per pixel.</figcaption>
+						  </td>
+					  </tr>
+					</table>
+				  </div>
+				  <p>
+					Here, we can see that as the radiance gets accumulated by each bounce, the scene gets increasingly brither and surfaces that were hidden get more and more exposed. 
+					The shadows are also less darker but beyond m = 3, it can be a bit difficult to notice any significant changes. The most obvious difference is from m = 0 to m = 1 
+					and then m = 1 to m = 2. This is because the intensity of the light that gets reflected decreases as the number of bounces increase.
+				  </p>
+				  <div class ="ribbon">For CBbunny.dae, output the Russian Roulette rendering with max_ray_depth set to 0, 1, 2, 3, 4, and 100(the -m flag). Use 1024 samples per pixel.</div>
+				  <div>
+					<table style="width:100%">
+					  <tr>
+						<td>
+						  <img src="imgs/hw3-part4-5-0.png" align:middle width="500px"/>
+						  <figcaption text-align:middle>Rendering of bunny.dae with max_ray_depth = 0, using 1024 samples per pixel.</figcaption>
+						</td>
+						<td>
+							<img src="imgs/hw3-part4-5-1.png" align:middle width="500px"/>
+							<figcaption text-align:middle>Rendering of bunny.dae with max_ray_depth = 1 using 1024 samples per pixel. </figcaption>
+						</td>
+					  </tr>
+					  <br>
+					  <tr>
+						<td>
+						  <img src="imgs/hw3-part4-5-2.png" align:middle width="500px"/>
+						  <figcaption text-align:middle>Rendering of bunny.dae with max_ray_depth = 2 using 1024 samples per pixel.</figcaption>
+						</td>
+						<td>
+							<img src="imgs/hw3-part4-5-3.png" align:middle width="500px"/>
+							<figcaption text-align:middle>Rendering of bunny.dae with max_ray_depth = 3 using 1024 samples per pixel.</figcaption>
+						</td>
+					  </tr>
+					  <br>
+					  <tr>
+						<td>
+						  <img src="imgs/hw3-part4-5-4.png" align:middle width="500px"/>
+						  <figcaption text-align:middle>Rendering of bunny.dae with max_ray_depth = 4 using 1024 samples per pixel.</figcaption>
+						</td>
+						<td>
+							<img src="imgs/hw3-part4-5-100.png" align:middle width="500px"/>
+							<figcaption text-align:middle>Rendering of bunny.dae with max_ray_depth = 100 using 1024 samples per pixel.</figcaption>
+						  </td>
+					  </tr>
+					</table>
+				  </div>
+				  <div class ="ribbon">Pick one scene and compare rendered views with various sample-per-pixel rates, including at least 1, 2, 4, 8, 16, 64, and 1024. Use 4 light rays.</div>
 
         </section>
 
