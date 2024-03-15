@@ -230,7 +230,7 @@
 				Importance sampling is done by sampling the light sources directly.
 			  </p>
 			  <p>
-				First, make a for loop for each SceneLight in the sample.
+				First, make a for loop for each SceneLight in the sample:
 			  </p>
 			  <ul>
 				<li>
@@ -266,6 +266,49 @@
 					Then to get the average, divide the light by the number of light takes taken.
 				</li>
 			  </ul>
+			  <div>
+				<table style="width:100%">
+				  <tr>
+					<td>
+					  <img src="imgs/hw3-part3-2-2.png" align:middle width="500px"/>
+					  <figcaption text-align:middle>dragon.dae with 64 camera rays per pixel and 32 samples per area light</figcaption>
+					</td>
+					<td>
+						<img src="imgs/hw3-part3-2-2.png" align:middle width="500px"/>
+						<figcaption text-align:middle>wall-e.dae with 64 camera rays per pixel and 32 samples per area light</figcaption>
+					  </td>
+				  </tr>
+				</table>
+			  </div>
+			  <div class ="ribbon">Focus on one particular scene with at least one area light and compare the noise levels in soft shadows when rendering with 
+				1, 4, 16, and 64 light rays (the -l flag) and with 1 sample per pixel (the -s flag) using light sampling, not uniform hemisphere sampling
+			</div>
+			<div>
+				<table style="width:100%">
+				  <tr>
+					<td>
+					  <img src="imgs/hw3-part3-3-1.png" align:middle width="500px"/>
+					  <figcaption text-align:middle>dragon.dae with 64 camera rays per pixel and 32 samples per area light</figcaption>
+					</td>
+					<td>
+						<img src="imgs/hw3-part3-3-2.png" align:middle width="500px"/>
+						<figcaption text-align:middle>wall-e.dae with 64 camera rays per pixel and 32 samples per area light</figcaption>
+					  </td>
+				  </tr>
+				  <br>
+				  <tr>
+					<td>
+					  <img src="imgs/hw3-part3-3-3.png" align:middle width="500px"/>
+					  <figcaption text-align:middle>dragon.dae with 64 camera rays per pixel and 32 samples per area light</figcaption>
+					</td>
+					<td>
+						<img src="imgs/hw3-part3-3-4.png" align:middle width="500px"/>
+						<figcaption text-align:middle>wall-e.dae with 64 camera rays per pixel and 32 samples per area light</figcaption>
+					  </td>
+				  </tr>
+				</table>
+			  </div>
+
         </section>
 
         <section id="part4">
