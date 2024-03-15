@@ -308,22 +308,96 @@
 				  </tr>
 				</table>
 			  </div>
-
+			  <p>
+				Looking at these images, we can see that as the number of light rays increases, the shadows become less and less noisy. This is because
+				when we increase the number of light samples, we get a better approximation of the actual distribution of light in the scence, and thus theres a bigger chance
+				we get more of the light and surface interaction.
+			  </p>
+			  <div class ="ribbon">Compare the results between uniform hemisphere sampling and lighting sampling in a one-paragraph analysis.</div>
+			  <p>
+				Uniform hemisphere sampling will converge much slower and generally will have much more noise in its scenes than compared to lighting sampling.
+				This is because in uniform hemisphere sampling, only a small portion of the rays from the hit point will actually intersect a light source directly due to how we're sampling
+				thus, it will have more darker patches. In lighting sampling we only consider rays that contribute to the illumination of the surface point, and thus creates better renderings.
+			  </p>
         </section>
 
         <section id="part4">
             <h2>Part 4: Global Illumination</h2>
             <p>
-                Describe how global illumination is achieved in your pathtracer, including the challenges faced and how they were overcome.
+				In this section, we finally add support for indirect lighting.
             </p>
-            <table>
-                <tr>
-                    <td><img src="path_to_your_image.jpg" alt="Part 4 Image"></td>
-                </tr>
-                <tr>
-                    <td>Image description or caption</td>
-                </tr>
-            </table>
+			<div class ="ribbon">Walk through your implementation of the indirect lighting function.</div>
+			<ul>
+				<li>
+					First, initialize the illumination by calling one_bounce_radiance(), which was done in the previous part.
+				</li>
+				<li>
+					Do a check if the max_ray_depth is less than 1, and if it is, terminate the function and return the light.
+				</li>
+				<li>
+					Also terminate with some probability due to Russian Roulette. I used 0.35 as the probability. Also do a check to see if the depth of the ray is the max_ray_depth.
+				</li>
+				<li>
+					If those checks pass, then initialize the variables wi and pdf. Then, take a sample from the surface BSDF by calling isect.bsdf->sample_f(), which will compute the sampled wi and the pdf and return the BSDF.
+				</li>
+				<li>
+					Then convert wi into the world space coordinates and pass in the origin (which is the hit point offset by EPS_F * world_space vector), then the world_space vector, then lastly the depth (which is the current depth - 1 since we are doing a recursive call).
+				</li>
+				<li>
+					Then create a intersect struct, and see if the new ray intersects the bvh, and if it does, get the radiance of the ray by recursively calling at_least_one_bounce_radiance() on the new ray. Additionally, add to the cumulative light by multiplying by the current BSDF as well as the cosine of wi. 
+				</li>
+				<li>
+					Then we divide by the pdf and 0.35 for any bias.
+				</li>
+			</ul>
+			<div class ="ribbon">Show some images rendered with global (direct and indirect) illumination. Use 1024 samples per pixel.</div>
+            <div>
+				<table style="width:100%">
+				  <tr>
+					<td>
+					  <img src="imgs/hw3-part4-1-1.png" align:middle width="500px"/>
+					  <figcaption text-align:middle>This is a rendering of CBlucy with global illumination using 1024 samples per pixel. You can notice that the statue is completely black. This is because that object does not use diffuse BSDF.</figcaption>
+					</td>
+					<td>
+						<img src="imgs/hw3-part4-1-2.png" align:middle width="500px"/>
+						<figcaption text-align:middle>This is a rendering of bunny.dae with global illumination using 1024 samples per pixel. </figcaption>
+					</td>
+				  </tr>
+				</table>
+			  </div>
+			  <div class ="ribbon">Pick one scene and compare rendered views first with only direct illumination, then only indirect illumination. Use 1024 samples per pixel.</div>
+			  <div>
+				<table style="width:100%">
+				  <tr>
+					<td>
+					  <img src="imgs/hw3-part4-2-1.png" align:middle width="500px"/>
+					  <figcaption text-align:middle>This is a rendering of CBspheres_lambertian.dae with only direct lighting using 1024 samples per pixel.</figcaption>
+					</td>
+					<td>
+						<img src="imgs/hw3-part4-2-2.png" align:middle width="500px"/>
+						<figcaption text-align:middle>This is a rendering of CBspheres_lambertian.dae with only indirect lighting using 1024 samples per pixel. Here you can notice that only certain parts of the scene, such as the ceiling, are only lit by indirect bounces of light.</figcaption>
+					</td>
+				  </tr>
+				</table>
+			  </div>
+			  <div class ="ribbon">For CBbunny.dae, render the mth bounce of light with max_ray_depth set to 0, 1, 2, 3, 4, and 5 (the -m flag), and isAccumBounces=false. 
+				Explain in your writeup what you see for the 2nd and 3rd bounce of light, and how it contributes to the quality of the rendered image compared to rasterization. 
+				Use 1024 samples per pixel.</div>
+				<div>
+					<table style="width:100%">
+					  <tr>
+						<td>
+						  <img src="imgs/hw3-part4-3-.png" align:middle width="500px"/>
+						  <figcaption text-align:middle>This is a rendering of CBlucy with global illumination using 1024 samples per pixel. You can notice that the statue is completely black. This is because that object does not use diffuse BSDF.</figcaption>
+						</td>
+						<td>
+							<img src="imgs/hw3-part4-1-2.png" align:middle width="500px"/>
+							<figcaption text-align:middle>This is a rendering of bunny.dae with global illumination using 1024 samples per pixel. </figcaption>
+						</td>
+					  </tr>
+					</table>
+				  </div>
+
         </section>
 
         <section id="part5">
