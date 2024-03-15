@@ -1,7 +1,306 @@
-<html>
-	<head>
-	</head>
-	<body>
-		Homework 3 index.html here
-	</body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CS184 Assignment 3-1: Pathtracer</title>
+    <style>
+        body{
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            text-align: left;
+        }
+        header, footer {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+        }
+        .ribbon {
+          color: #fff;
+          display: inline-block;
+          padding: 5px 10px;
+          border-left: 5px solid orange;
+          background: rgba(0, 0, 0, 0.1);
+        }
+        img {
+            width: 480px;
+            height: 360px;
+            margin-top: 10px;
+        }
+        table {
+            width: 100%;
+            margin: 20px 0;
+        }
+        th, td {
+            text-align: center;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>CS184 Assignment 3-1: Pathtracer</h1>
+            <h2>Abrar Karim</h2>
+        </header>
+
+        <section id="overview">
+            <h2>Overview</h2>
+            <p>
+				In this project, I implemented the core routines of a physically-based renderer using a pathtracing algorithm. 
+				Path tracing is a rendering technique that allows for the simulation of light in order to produce illumination in images.
+				This was a really cool and extremely frustrauting project to work on since simple mistakes in the earlier stages 
+				had built up to be a huge pain in the later stages. It was also difficult to debug so it took a lot more time than
+				I had expected for it, but nothing really beats the dopamine hit of waiting 20 minutes for a photo to render and it renders
+				perfectly!
+            </p>
+        </section>
+
+        <section id="part1">
+            <h2>Part 1: Ray Generation and Scene Intersection</h2>
+            <p>
+				This part was to implement the functions that would generate rays as well as testing when triangles and spheres would be
+				intersected by light. 
+            </p>
+            <div class ="ribbon">Walk through the ray generation and primitive intersection parts of the rendering pipeline.</div>
+			<p>
+				In order to generate the rays, I had to complete the function Camera::generate_ray, which took in a double x and double y as parameters. 
+				In this function, I converted hFov and vFov into the radians by calling radians() on them both, then multiplied them by 0.5 and took the tangent 
+				of that to convert it into a point in the image plane. These new coordinations, alongside the origin (0,0), creates the ray that will be generated in 
+				camera coordinates. Now we have to convert it into word coordinates, which was done by adding the position of the camera to both coordinates and then multiplying 
+				it by the matrix c2w. 
+			</p>
+			<div class ="ribbon">Explain the triangle intersection algorithm you implemented in your own words.</div>
+			<p>
+				In order to implement the triangle intersection algorithm, I implemented the Moller Trumbore Algorithm. First, I 
+				calculated the normal vector of the triangle and then saw if there was an intersection with the ray. If an intersection is found, then I test to see if the 
+				intersection point is inside the triangle by looking at the barycentric coordinates of that interaction point. We know that if the alpha, beta and gamma are between [0,1] 
+				and sum up to 1, then the point is inside the triangle. If this is the case, then I updated the ray’s max_t to the point calculated so the intersection doesn’t occur again in the future.
+			</p>
+			<div class ="ribbon">Show images with normal shading for a few small .dae files..</div>
+			<div>
+				<table style="width:100%">
+				  <tr>
+					<td>
+					  <img src="imgs/hw3-part1-1.png" align:middle width="500px"/>
+					  <figcaption text-align:middle>CBspheres_lambertian.dae</figcaption>
+					</td>
+					<td>
+						<img src="imgs/hw3-part1-2.png" align:middle width="500px"/>
+						<figcaption text-align:middle>bunny.dae</figcaption>
+					</td>
+				  </tr>
+				  <br>
+				  <tr>
+					<td>
+					  <img src="imgs/hw3-part1-3.png" align:middle width="500px"/>
+					  <figcaption text-align:middle>bench.dae</figcaption>
+					</td>
+					<td>
+						<img src="imgs/hw3-part1-p4.png" align:middle width="500px"/>
+						<figcaption text-align:middle>blob.dae</figcaption>
+					</td>
+				  </tr>
+				</table>
+			  </div>
+        </section>
+
+        <section id="part2">
+            <h2>Part 2: Bounding Volume Hierarchy</h2>
+            <p>
+				Trying to render the photos in the previous section, they took a really long time to render, and any scene that might have more
+				than a couple hundred primitives might take a really REALLY long time to render. Thus in order to expedite this, I implemented a 
+				popular acceleratoin structure for ray tracing: bounding volume hierachu, which is a binary tree of geometric primitives.
+            </p>
+			<div class ="ribbon">Walk through your BVH construction algorithm. Explain the heuristic you chose for picking the splitting point.</div>
+			<p>	
+				For the BVH construction algorithm, I first go through each primitive and add it to my BBox to compute the bounding box of all the primitives, 
+				as well as add in a counter variable to count the number of primitives. Then I initialize a new BVHNode with that bounding box. 
+				If the number of primitives is less than or equal to the max_leav_size, then I know it's a leaf node, so I set the node’s start and end to the 
+				iterators passed in and return the node. If not, then I know it is an internal node. I find the largest dimension of the centroid box’s extend as 
+				the axis to split on. Then I go through each primitive and if the primitive’s centroid in the axis is less than the centroid box’s extend, then it 
+				goes in the left primitive list and vice versa for the right one. Then I recursively assign the left and right subtrees on the two primitive lists I made. 
+				Then in the case where all the primitives might get assigned to either side, I simply cut the list in half and assign it evenly to the left primitive list and 
+				the right primitive list and recursively assign them to avoid infinite recursion. I chose this heuristic specifically because it was simple to implement and didn't take too long.
+				It also got the job done as it significantly sped up the rendering speed process.
+			</p>
+			<div class ="ribbon">Show images with normal shading for a few large .dae files that you can only render with BVH acceleration.</div>
+			<div>
+				<table style="width:100%">
+				  <tr>
+					<td>
+					  <img src="imgs/hw3-part2-1.png" align:middle width="500px"/>
+					  <figcaption text-align:middle>CBLucy.dae</figcaption>
+					</td>
+					<td>
+						<img src="imgs/hw3-part2-2.png" align:middle width="500px"/>
+						<figcaption text-align:middle>maxplanck.dae</figcaption>
+					</td>
+				  </tr>
+				  <br>
+				  <tr>
+					<td>
+					  <img src="imgs/hw3-part2-3.png" align:middle width="500px"/>
+					  <figcaption text-align:middle>beast.dae</figcaption>
+					</td>
+					<td>
+						<img src="imgs/hw3-part2-4.png" align:middle width="500px"/>
+						<figcaption text-align:middle>blob.dae, This one rendered so much faster.</figcaption>
+					</td>
+				  </tr>
+				</table>
+			  </div>
+			  <div class ="ribbon">Compare rendering times on a few scenes with moderately complex geometries with and without BVH acceleration. Present your results in a one-paragraph analysis.</div>
+			  <p>
+				The scenes I chose to compare were the dragon.dae, cow.dae and CBspheres_lambertian.dae scenes. 
+				The CBspheres_lambertian.dae had 14 primitives. Without BVH, it averaged 9.9 intersection tests per ray, and took a rending time of 0.035 seconds.
+				With BVH, it averaged 8.2 intersection tests per ray and rendering time was 0.030 seconds.
+				For the dragon, it had 10,012 primitives. Without BVH it averaged 21,249.584965 intersection tests per ray, with a render speed of 798.6144s.
+				With BVH, it averaged 2.946197 intersection tests per ray with a render speed of 0.0681s!
+				For the cow, it had 5,856 primitives. Without BVH, it averaged 1030.747625 intersection tests per ray with a render speed of 31.8840s
+				With BVH, it averaged 2.604955 intersection tests per ray with a render speed of 0.1146s.
+				Here we can see that even with a simple heuristic, it can make a really impactful improvement in rendering time, going from minutes to being done in less than seconds.
+				A scene with smaller amounts of primitives don't see much improvement but as the number of primitives go up, it gets more and more useful.
+				The BVH construction does add some pre-processing time since it has to go through the list of primitives but it is offset by the benefits it provides in saving time.
+			  </p>
+        </section>
+
+        <section id="part3">
+            <h2>Part 3: Direct Illumination</h2>
+            <p>
+				Now that we have sped up the rendering time to mere seconds, we can get to the bulk of the project, which is modeling realistic shading. For this part
+				we added in direct illumination, sampling either from the hemisphere or importance.
+            </p>
+			<div class ="ribbon">Walk through both implementations of the direct lighting function.</div>
+			<p>
+				Uniform hemipshere sampling.
+			</p>
+			<ul>
+				<li>
+					First, make a local coordinate space using the intersection normal such that the normal to the source is at (0, 0, 1). 
+					We will use these in the BSDF functions.
+				</li>
+				<li>
+					Then create a sampling loop where we repeat it num_sample times.
+					<ul>
+						<li>
+							First, sample a random unit vector in the object space hemisphere using hemisphereSampler->get_sample().
+						</li>
+						<li>
+							Second, convert the unit vector into world space using the o2w transformation matrix
+						</li>
+						<li>
+							Third, create a new intersect struct and a ray with the origin being hit_p (the hit point) and the direction being the world_space vector. 
+							Also add to the origin a small offset of EPS_F * world_space vector for any floating numerical precision issues.
+						</li>
+						<li>
+							Fourth, check if the ray intersects anything. If it does, then get the reflected emission for that ray by calling insec.bsdf->get_emission(), and the current BSDF by isect.bsdf->f(w_out, wj), 
+							where wj is the sampled random unit vector. Then add to the cumulative light by multiplying the current BSDF, the reflected emission and the cosine of the sampled random unit vector.
+						</li>
+					</ul>
+				</li>
+				<li>
+					Lastly, out of the for loop, divide the cumulative light by the pdf of the sampling scheme (which is 0.5 * pi), then divide by the num_samples to get the average.
+				</li>
+				<li>
+					Finally return the light.
+				</li>
+			</ul>
+            <div>
+				<table style="width:100%">
+				  <tr>
+					<td>
+					  <img src="imgs/hw3-part3-1-1.png" align:middle width="500px"/>
+					  <figcaption text-align:middle>CBspheres_lambertian.dae with 16 camera rays per pixel and 8 samples per area light</figcaption>
+					</td>
+					<td>
+						<img src="imgs/hw3-part3-1-2.png" align:middle width="500px"/>
+						<figcaption text-align:middle>CBspheres_lambertian.dae with 64 camera rays per pixel and 32 samples per area light</figcaption>
+					  </td>
+				  </tr>
+				</table>
+			  </div>
+			  <p>
+				Importance sampling is done by sampling the light sources directly.
+			  </p>
+			  <p>
+				First, make a for loop for each SceneLight in the sample.
+			  </p>
+			  <ul>
+				<li>
+					If the light is a delta light, sample once. Otherwise, sample ns_area_light times.
+				</li>
+				<li>
+					For each sample:
+					<ul>
+						<li>
+							Initialize the pdf, wi, and distToLight variables.
+						</li>
+						<li>
+							Find the radiance by calling SceneLight::sample_L(), and pass in the pdf, wi, and distToLight variables since this function will calculate those values.
+						</li>
+						<li>
+							Check if the z coordinate of wi is negative, and if its not then continue
+						</li>
+						<li>
+							Create a new ray with the origin at the hit point (hit_p) and a direction wi. Again,  add to the origin a small offset of EPS_F * world_space vector for any floating numerical precision issues.
+						</li>
+						<li>
+							Update the ray’s max_t to be the distToLight.
+						</li>
+						<li>
+							Create a new intersect struct and see if the ray interests anything. If it doesn't, get the current BSDF by calling isect.bsdf->f().
+						</li>
+						<li>
+							Then add to the cumulative light by multiplying the current BSDF, the radiance and the cosine of wi. Then divide it by the pdf to account for the sampling distribution.
+						</li>
+					</ul>
+				</li>
+				<li>
+					Then to get the average, divide the light by the number of light takes taken.
+				</li>
+			  </ul>
+        </section>
+
+        <section id="part4">
+            <h2>Part 4: Global Illumination</h2>
+            <p>
+                Describe how global illumination is achieved in your pathtracer, including the challenges faced and how they were overcome.
+            </p>
+            <table>
+                <tr>
+                    <td><img src="path_to_your_image.jpg" alt="Part 4 Image"></td>
+                </tr>
+                <tr>
+                    <td>Image description or caption</td>
+                </tr>
+            </table>
+        </section>
+
+        <section id="part5">
+            <h2>Part 5: Adaptive Sampling</h2>
+            <p>
+                Outline the adaptive sampling strategies you employed to improve rendering efficiency and image quality, along with any results or comparisons.
+            </p>
+            <table>
+                <tr>
+                    <td><img src="path_to_your_image.jpg" alt="Part 5 Image"></td>
+                </tr>
+                <tr>
+                    <td>Image description or caption</td>
+                </tr>
+            </table>
+        </section>
+
+        <footer>
+            <p>&copy; 2024 Abrar Karim. All rights reserved.</p>
+        </footer>
+    </div>
+</body>
 </html>
