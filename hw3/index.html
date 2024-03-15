@@ -329,13 +329,13 @@
 			<div class ="ribbon">Walk through your implementation of the indirect lighting function.</div>
 			<ul>
 				<li>
-					First, initialize the illumination by calling one_bounce_radiance(), which was done in the previous part.
+					First, initialize the illumination by calling one_bounce_radiance(), which was done in the previous part. Also initialize the ray depth to max_ray_deth so recursion will stop after max_ray_depth times.
 				</li>
 				<li>
 					Do a check if the max_ray_depth is less than 1, and if it is, terminate the function and return the light.
 				</li>
 				<li>
-					Also terminate with some probability due to Russian Roulette. I used 0.35 as the probability. Also do a check to see if the depth of the ray is the max_ray_depth.
+					Also terminate with some probability due to Russian Roulette. I used (1.0 - 0.4) as the probability. Also do a check to see if the depth of the ray is the max_ray_depth.
 				</li>
 				<li>
 					If those checks pass, then initialize the variables wi and pdf. Then, take a sample from the surface BSDF by calling isect.bsdf->sample_f(), which will compute the sampled wi and the pdf and return the BSDF.
@@ -350,6 +350,9 @@
 					Then we divide by the pdf and 0.35 for any bias.
 				</li>
 			</ul>
+			<p>
+				For the edge case of when isAccumBounce = false, the light will be reset to the monte carlo sum of the next bounce so when we terminate the function, we keep only the radiance from the last bounce.
+			</p>
 			<div class ="ribbon">Show some images rendered with global (direct and indirect) illumination. Use 1024 samples per pixel.</div>
             <div>
 				<table style="width:100%">
@@ -375,11 +378,15 @@
 					</td>
 					<td>
 						<img src="imgs/hw3-part4-2-2.png" align:middle width="500px"/>
-						<figcaption text-align:middle>This is a rendering of CBspheres_lambertian.dae with only indirect lighting using 1024 samples per pixel. Here you can notice that only certain parts of the scene, such as the ceiling, are only lit by indirect bounces of light.</figcaption>
+						<figcaption text-align:middle>This is a rendering of CBspheres_lambertian.dae with only indirect lighting using 1024 samples per pixel. </figcaption>
 					</td>
 				  </tr>
 				</table>
 			  </div>
+			  <p>
+				Here, we can notice that with the indirect illunminion, the spheres are covered because the surrounding walls are reflected onto the spheres and as the number of bounces increase, the intensity of the reflection will decrease.
+				However, you will notice the opposite for direct illunminion (the top of the spheres and walls have strong highlights) and that's because the first ray of light can't hit places covered by the spheres or behind the ceiling.
+			  </p>
 			  <div class ="ribbon">For CBbunny.dae, render the mth bounce of light with max_ray_depth set to 0, 1, 2, 3, 4, and 5 (the -m flag), and isAccumBounces=false. 
 				Explain in your writeup what you see for the 2nd and 3rd bounce of light, and how it contributes to the quality of the rendered image compared to rasterization. 
 				Use 1024 samples per pixel.</div>
@@ -387,16 +394,41 @@
 					<table style="width:100%">
 					  <tr>
 						<td>
-						  <img src="imgs/hw3-part4-3-.png" align:middle width="500px"/>
-						  <figcaption text-align:middle>This is a rendering of CBlucy with global illumination using 1024 samples per pixel. You can notice that the statue is completely black. This is because that object does not use diffuse BSDF.</figcaption>
+						  <img src="imgs/hw3-part4-3-0.png" align:middle width="500px"/>
+						  <figcaption text-align:middle>Rendering of bunny.dae with max_ray_depth = 0 and isAccumBounces=false, using 1024 samples per pixel.</figcaption>
 						</td>
 						<td>
-							<img src="imgs/hw3-part4-1-2.png" align:middle width="500px"/>
-							<figcaption text-align:middle>This is a rendering of bunny.dae with global illumination using 1024 samples per pixel. </figcaption>
+							<img src="imgs/hw3-part4-3-1.png" align:middle width="500px"/>
+							<figcaption text-align:middle>Rendering of bunny.dae with max_ray_depth = 1 and isAccumBounces=false, using 1024 samples per pixel. </figcaption>
+						</td>
+					  </tr>
+					  <br>
+					  <tr>
+						<td>
+						  <img src="imgs/hw3-part4-3-2.png" align:middle width="500px"/>
+						  <figcaption text-align:middle>Rendering of bunny.dae with max_ray_depth = 2 and isAccumBounces=false, using 1024 samples per pixel.</figcaption>
+						</td>
+						<td>
+							<img src="imgs/hw3-part4-3-3.png" align:middle width="500px"/>
+							<figcaption text-align:middle>Rendering of bunny.dae with max_ray_depth = 3 and isAccumBounces=false, using 1024 samples per pixel.</figcaption>
+						</td>
+					  </tr>
+					  <br>
+					  <tr>
+						<td>
+						  <img src="imgs/hw3-part4-3-4.png" align:middle width="500px"/>
+						  <figcaption text-align:middle>Rendering of bunny.dae with max_ray_depth = 4 and isAccumBounces=false, using 1024 samples per pixel.</figcaption>
 						</td>
 					  </tr>
 					</table>
 				  </div>
+				  <p>
+					In the second bounce of light, it is much brighter than the third one, specifically the underside and the front of the rabbit. On the other hand, the third bounce shows areas behind the bunny being lighter.
+					This is because after more bounces, there is more light that will bounce off behind the bunny vs the front of the bunny will be rendered more the first few bounces and then taper off. 
+					When we add up these bounces, we see that the quality of the image is better since it will take into account the global illumination, not just direct light intersecting the objects.
+				  </p>
+				  <div class ="ribbon">For CBbunny.dae, compare rendered views with max_ray_depth set to 0, 1, 2, 3, 4, and 5(the -m flag). Use 1024 samples per pixel.</div>
+
 
         </section>
 
