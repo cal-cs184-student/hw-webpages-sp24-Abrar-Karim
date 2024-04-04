@@ -1,7 +1,606 @@
-<html>
-	<head>
-	</head>
-	<body>
-		Homework 4 index.html here
-	</body>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <style>
+    body {
+      background-color: #404040;
+      background-color: white;
+      padding: 100px;
+      width: 1000px;
+      margin: auto;
+      text-align: left;
+      font-weight: 300;
+      font-family: 'Open Sans', sans-serif;
+      color: #121212;
+      /* cursor: url(https://rsha256.github.io/teapot-clear32.png), default!important;
+      cursor: url(https://rsha256.github.io/teapot-clear32.png), pointer!important; */
+      cursor: url(https://rsha256.github.io/dragon-clear32.png), default!important;
+      cursor: url(https://rsha256.github.io/dragon-clear32.png), pointer!important;
+      /* cursor: url(https://rsha256.github.io/cloth-clear-32.png), default!important;
+      cursor: url(https://rsha256.github.io/cloth-clear-32.png), pointer!important; */
+    }
+    h1, h2, h3, h4 {
+      font-family: 'Source Sans Pro', sans-serif;
+    }
+    kbd {
+      color: #121212;
+    }
+    blockquote {
+      color: #888;
+      border: 2px solid #333;
+      padding: 10px;
+      background-color: #ccc;
+    }
+
+    table.custom-tbl {
+      border: 1px solid;
+    }
+
+    table.custom-tbl th {
+      border: 1px solid;
+      background-color: rgb(99, 209, 209);
+    }
+
+    table.custom-tbl td {
+      border: 1px solid;
+      background-color: #f1e686a8;
+    }
+  </style>
+
+  <title>CS 184 Mesh Editor</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <!-- Not using below due to lacking bold fontfaces -->
+  <!-- <link href="https://fonts.googleapis.com/css?family=Open+Sans|Source+Sans+Pro|Source+Sans+Pro:400,700" rel="stylesheet"> -->
+  <link href="https://fonts.googleapis.com/css?family=Roboto+Mono|Roboto+Slab|Roboto:300,400,500,700" rel="stylesheet" />
+
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+  </script>  
+</head>
+
+<body>
+
+  <h1 align="middle">CS 184: Computer Graphics and Imaging, Spring 2024</h1>
+  <h1 align="middle">Project 4: Cloth Simulator</h1>
+  <h2 align="middle">Abrar Karim</h2>
+
+  <br><br>
+
+  <div>
+    <h2 align="middle">Overview</h2>
+    <p>In this project, I implemented real-time cloth simulation that can detect self-collision as well as collision with other 
+      primitives (such as a sphere). On top of that, I had built several shaders to change the visual look in order to be able to 
+      stylize the simulation. The simulator was essentially built on equations of motions (such as mass, springs and force) and a 
+      cloth data structure. This data structure is modeled as a 2D grid of point masses and were connected by different springs 
+      such as structural, shearing and bending.
+    </p>
+  </div>
+
+  <a href="https://cs184.eecs.berkeley.edu/sp23/docs/proj4-part-1">
+  <h2 align="middle">Part 1: Masses and springs</h2>
+  </a>
+  <blockquote><b>
+    Overview of Implementation
+  </b></blockquote>
+  <p>Like stated in the overview, the data structure is modeled as a 2D grid of point masses. This was done in this section. 
+    Each cloth has an input width and height as well as the number of PointMasses that would be needed to represent the cloth, 
+    stored in the num_width_points and num_height_points variables. I implemented this function by having a nested for loop, 
+    first iterating through the num_height_points and then the nested for loop being an iteration through num_width_points, since 
+    we wanted the points to be in row-major order. Then for each point, I checked if the cloth is horizontal (same y value) in which 
+    case I would set the point’s position’s y-value to be 1.0 so the points have the uniform height. If the cloth was vertical, then 
+    I would set the point’s position’s z-value to a random offset between 1/1000 and -1/1000 so all point masses end up falling to 
+    either side of the starting position to mimic real cloth. In addition to this, each point has a pinned variable which indicates 
+    if the point should be moved or not during simulation steps. Then this point would be added to the cloth data structure's 
+    point_masses vector.
+    After that, I have to add the different springs. There are three different types of springs: Structural, Shearing, and Bending. 
+    I looped through the cloth’s point_masses and connected point_masses using their respective spring if the condition was met.</p>
+    <blockquote><b>
+      Take some screenshots of <i>scene/pinned2.json</i> from a viewing angle where you can clearly see the cloth wireframe 
+      to show the structure of your point masses and springs. 
+    </b></blockquote>
+    <div align="middle">
+      <table style="width:100%">
+        <tr align="center">
+          <td>
+            <img src="images/hw4-part1-wireframe-1.png" align="middle" width="300vw" />
+          </td>
+          <td>
+            <img src="images/hw4-part1-wireframe-2.png" align="middle" width="300vw" />
+            <figcaption>Initial configuration ($\text{ks} = 5,000$)</figcaption>
+          </td>
+          <td>
+        </tr>
+      </table>
+    </div>
+    <blockquote><b>
+      Show us what the wireframe looks like (1) without any shearing constraints, 
+      (2) with only shearing constraints, and (3) with all constraints.
+    </b></blockquote>
+
+    <div align="middle">
+      <table style="width:100%">
+        <tr align="center">
+          <td>
+            <img src="images/hw4-part1-no-shear.png" align="middle" width="500px" />
+            <figcaption>No shearing constraints</figcaption>
+          </td>
+        </tr>
+        <tr align="center">
+          <td>
+            <img src="images/hw4-part1-only-shear.png" align="middle" width="500px" />
+            <figcaption>Only shearing constraints</figcaption>
+          </td>
+        </tr>
+        <tr align="center">
+          <td>
+            <img src="images/hw4-part1-all-constraints.png" align="middle" width="500px" />
+            <figcaption>All constraints</figcaption>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+
+
+  <a href="https://cs184.eecs.berkeley.edu/sp23/docs/proj4-part-2">
+  <h2 align="middle">Part 2: Simulation via numerical integration</h2>
+  </a>
+  <blockquote><b>
+    Overview of Implementation
+  </b></blockquote>
+  <p>
+    This part of the project was to simulate how the cloth would move over time. In this simulation, we have two primary forces 
+    that affect objects: external forces and spring correction forces. External forces exert uniform force to all objects in the 
+    scene (an example could be gravity). Spring correction forces affect each point differently based on the spring type.
+    I implemented this part by going through each point_mass and added the total external force exert on it by using Newton’s 
+    second law (Force = mass * acceleration). Then in order to apply the spring correction forces, I iterated through the 
+    point_masses again and used Hooke’s law to calculate the force applied to the two point_masses attached. However, if the 
+    spring was a bending type, then I used a smaller spring constant.
+    After that, we have to figure out where the new point masses will be after they get affected by the forces. I did this by 
+    using Verlet integration. I iterated through each point_mass, checked if it was pinned or not (because if it was pinned, 
+    then the point is not allowed to move), and then calculated the new position using the Verlet integration formula.
+    Lastly, I made sure that the distance between the two points of a string was never greater than 10% of the spring's resting 
+    length. I did this by looping through each spring and if neither of the spring’s points are pinned, then I corrected both 
+    point positions. If only one of the points were pinned, then I would correct the other point. This correction value was the 
+    current distance between the points multiplied by the difference between the max distance (10%).
+
+  </p>
+    <blockquote><b>
+      Experiment with some the parameters in the simulation. 
+      To do so, pause the simulation at the start with <kbd>P</kbd>, modify the values of interest, and then resume by pressing <kbd>P</kbd> again. 
+      You can also restart the simulation at any time from the cloth's starting position by pressing <kbd>R</kbd>.
+      <br />
+      <small>
+      Describe the effects of changing the spring constant <code>ks</code>; how does the cloth behave from start to rest with a very low <code>ks</code>? 
+      A high <code>ks</code>?
+      </small>
+    </b></blockquote>
+    <div align="middle">
+      <table style="width:100%">
+        <tr align="center">
+          <td>
+            <img src="images/hw4-part2-low-ks.png" align="middle" width="400vw" />
+            <figcaption>Low ks</figcaption>
+          </td>
+          <td>
+            <img src="images/hw4-part2-high-ks.png" align="middle" width="400vw" />
+            <figcaption>High ks</figcaption>
+          </td>
+          <td>
+        </tr>
+      </table>
+    </div>
+    <p>
+      Ks is the spring constant in Hooke’s law and it’s used to measure how stiff a spring would be. Since it is uniformly 
+      applied to all springs, I noticed that with a lower ks value, the springs would be “stretchier” and with a higher ks value, 
+      the springs would be “tighter”.
+    </p>
+
+    <blockquote><b>
+      <small>
+        What about for <code>density</code>?
+      </small>
+    </b></blockquote>
+    <div align="middle">
+      <table style="width:100%">
+        <tr align="center">
+          <td>
+            <img src="images/hw4-part2-low-density.png" align="middle" width="400vw" />
+            <figcaption>Low density</figcaption>
+          </td>
+          <td>
+            <img src="images/hw4-part2-high-density.png" align="middle" width="400vw" />
+            <figcaption>High density</figcaption>
+          </td>
+          <td>
+        </tr>
+      </table>
+    </div>
+    <p>
+      Density is the mass per unit area of the cloth. Using physics knowledge, I had a feeling that with a lower density, 
+      the external forces would have a lower impact (since the force formula uses mass so if we decrease mass for the same 
+      acceleration value, force will decrease). Thus, with a lower density, the cloth is less susceptible to gravity and isn’t 
+      sagging down as much (the curve at the top middle is decreased). However, with a higher density, it is more affected by 
+      gravity so it will sag down more (the curve at the top middle is increased).
+    </p>
+    
+    <blockquote><b>
+      <small>
+        What about for <code>damping</code>?
+      </small>
+    </b></blockquote>
+    <div align="middle">
+      <table style="width:100%">
+        <tr align="center">
+          <td>
+            <img src="images/hw4-part2-low-damping.png" align="middle" width="400vw" />
+            <figcaption>Low damping</figcaption>
+          </td>
+          <td>
+            <img src="images/hw4-part2-high-damping.png" align="middle" width="400vw" />
+            <figcaption>High damping</figcaption>
+          </td>
+          <td>
+        </tr>
+      </table>
+    </div>
+    <p>
+      Damping is used to simulate energy loss. It was hard to capture it in photos but during the actual simulation, it seemed 
+      like the damping value affected how quickly the simulation reached a state of rest. I noticed that with a higher damping 
+      value, the simulation came to rest much faster while with a lower damping value, it took longer. I tried with a damping 
+      value of 0 and it took a really long time (about 4-5 minutes?).
+    </p>
+
+    <blockquote><b>
+      <small>
+      For each of the above, observe any noticeable differences in the cloth compared to the default parameters 
+      and show us some screenshots of those interesting differences and describe when they occur.
+      </small>
+    </b></blockquote>
+  
+    <div align="middle">
+      <table style="width:100%">
+        <tr align="center">
+          <td>
+            <img src="images/hw4-part2-default-params.png" align="middle" width="400vw" />
+            <figcaption>Default Parameters</figcaption>
+          </td>
+        </tr>
+      </table>
+    </div>
+  
+    <p>
+      I explained the differences compared to the default paramaters in their respective sections above!
+    </p>
+
+
+    <blockquote><b>
+    Show us a screenshot of your shaded cloth from <i>scene/pinned4.json</i> in its final resting state! 
+    If you choose to use different parameters than the default ones, please list them.
+    </b></blockquote>
+
+    <div align="middle">
+      <table style="width:100%">
+        <tr align="center">
+          <td>
+            <img src="images/hw4-part2-4pins-1.png" align="middle" width="400vw" />
+            <figcaption>4 pins shaded</figcaption>
+          </td>
+          <td>
+            <img src="images/hw4-part2-4pins-2.png" align="middle" width="400vw" />
+            <figcaption>4 pins wireframe.</figcaption>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+
+
+  <a href="https://cs184.eecs.berkeley.edu/sp23/docs/proj4-part-3">
+  <h2 align="middle">Part 3: Handling collisions with other objects</h2>
+  </a>
+  <blockquote><b>
+    Overview of Implementation
+  </b></blockquote>
+    <p>
+    Like mentioned in the overview, I had implemented collision with other primitives. For this section, I implemented the 
+    plane’s collision with spheres and planes only.
+    </p>
+    <p>
+    For handling collision with spheres: Firstly, in the simulate function, I went through each point_mass and checked their 
+    positions. If the position was within the surface of the sphere or on the sphere itself, I would update the point_mass’ 
+    position so it lies on the sphere’s tangent. Then to find the correction vector, I calculated the difference between the 
+    tangent point and the point_mass’ last position. Then to find the new position, I took the correction vector and multiplied 
+    it against friction and then added it to the point_mass’ last position.
+    </p>
+    <p>For handling collision with planes: I used the ray-plane equation to find the tangent point of the point and the plane. 
+      Then I compare the point_mass’ current position with the last position and the tangent point. If it is greater, then we 
+      know the point_mass must’ve intersected the plane. If that happens, then I calculate the correction vector and then 
+      multiply it by the friction and add the point_mass’ last position and set the point_mass’ current position to that.
+  </p>
+    <blockquote><b>
+      Show us screenshots of your shaded cloth from <i>scene/sphere.json</i> in its final resting state 
+      on the sphere using the default <code>ks = 5000</code> as well as with <code>ks = 500</code> and <code>ks = 50000</code>. 
+    </b></blockquote>
+    
+    <div align="middle">
+      <table style="width:100%">
+        <tr align="center">
+          <td>
+            <img src="images/hw4-part3-low-ks.png" align="middle" width="300vw" />
+            <figcaption>$\text{ks} = 500$</figcaption>
+          </td>
+          <td>
+            <img src="images/hw4-part3-default-ks.png" align="middle" width="300vw" />
+            <figcaption>Initial configuration ($\text{ks} = 5,000$)</figcaption>
+          </td>
+          <td>
+            <img src="images/hw4-part3-high-ks.png" align="middle" width="300vw" />
+            <figcaption>$\text{ks} = 50,000$</figcaption>
+          </td>
+          <td>
+        </tr>
+      </table>
+    </div>
+
+
+    <blockquote><b>
+      <small>Describe the differences in the results.</small>
+    </b></blockquote>
+
+    <p>
+      Here, the differences are slight but noticeable. Compared with the default ks value (ks = 5000), we can see that with the lower
+      ks value (ks = 500), the cloth is attaching itself more to the sphere, producing less folds, meanwhile at a higher ks value (ks = 500,000)
+      the folds are very apparent and less of the cloth is attaching itself to the sphere.
+    </p>
+
+
+    <blockquote><b>
+      Show us a screenshot of your shaded cloth lying peacefully at rest on the plane. 
+      If you haven't by now, feel free to express your colorful creativity with the cloth! 
+      (You will need to complete the shaders portion first to show custom colors.)
+    </b></blockquote>
+
+    <div align="middle">
+      <img src="images/hw4-part3-plane.png" align="middle" width="100%" />
+    </div>
+
+
+
+  <a href="https://cs184.eecs.berkeley.edu/sp23/docs/proj4-part-4">
+  <h2 align="middle">Part 4: Handling self-collisions</h2>
+  </a>
+  <p>
+    Although we have implemented collision with other objects, the cloth isn’t able to collide with itself so if it hits a 
+    “floor”, it will just clip through. In order to fix this, I implemented self-collision so the cloth will fold upon itself. 
+    This was done by utilizing a hash table to store bounding volume boxes.
+    In order to implement this, I first put the cloth’s point_masses into bounding boxes, each containing some number of 
+    point_masses. Then using a custom hash function, I hashed each bounding box into buckets. By doing this, I was able to hash 
+    every point in the cloth and then built a spatial map that groups together the closest points within a section. 
+    These buckets are used for checking points with their nearest neighbors for clipping. Then if the difference between the 
+    points, is less than 2 * thickness, the initial point's position is adjusted to be a total of 2 x thickness distance away 
+    from that particular neighbor. Then the final position of the point is the average of all the corrected positions divided 
+    by the number of simulation steps the cloth sim is running. 
+  </p>
+    <blockquote><b>
+      Show us at least 3 screenshots that document how your cloth falls and folds on itself, 
+      starting with an early, initial self-collision 
+      and ending with the cloth at a more restful state (even if it is still slightly bouncy on the ground).
+    </b></blockquote>
+    
+    <div align="middle">
+      <table style="width:100%">
+        <tr align="center">
+          <td>
+            <img src="images/hw4-part4-1.png" align="middle" width="300vw" />
+            <figcaption>Self collision 1</figcaption>
+          </td>
+          <td>
+            <img src="images/hw4-part4-2.png" align="middle" width="300vw" />
+            <figcaption>Self collision 2</figcaption>
+          </td>
+          <td>
+            <img src="images/hw4-part4-3.png" align="middle" width="300vw" />
+            <figcaption>Self collision 3</figcaption>
+          </td>
+          <td>
+        </tr>
+      </table>
+    </div>
+
+
+    <blockquote><b>
+      Vary the <code>density</code> as well as <code>ks</code> 
+      
+      and describe with words and screenshots how they affect the behavior of the cloth as it falls on itself.
+    </b></blockquote>
+    <div align="middle">
+      <table style="width:100%">
+        <tr align="center">
+          <td>
+              <img src="images/hw4-part4-low-density.png" align="middle" width="400px" />
+              <figcaption>$\text{density} = 1$</figcaption>
+              
+          </td>
+          <td>
+              <img src="images/hw4-part4-high-density.png" align="middle" width="400px" />
+              <figcaption>$\text{density} = 50$</figcaption>
+          </td>
+        </tr>
+        <tr align="center">
+          <td>
+              <img src="images/hw4-part4-low-ks.png" align="middle" width="400px" />
+              <figcaption>$\text{ks} = 1,000$</figcaption>
+          </td>
+          <td>
+              <img src="images/hw4-part4-high-ks.png" align="middle" width="400px" />
+              <figcaption>$\text{ks} = 7,500$</figcaption>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <p>
+      In the low density image, we can see that the cloth is relatively smooth and all the folds are big. In the high density image, 
+      we can see there are plenty of wrinkles and there are both big and small folds, and some clipping does occur.
+    </p>
+    <p>
+      In the low ks one, we can see that the cloth is really wrinkled, which is probably because the springs are really elastic. 
+      On the other hand, with a high ks, because the springs were less elastic, there are larger folds.
+    </p>
+
+
+
+  <a href="https://cs184.eecs.berkeley.edu/sp23/docs/proj4-part-5">
+  <h2 align="middle">Part 5: Cloth Sim</h2>
+  </a>
+
+    <blockquote><b>
+    Explain in your own words what is a shader program and how vertex and fragment shaders work together to create lighting and material effects.
+    </b></blockquote>
+
+    <p>
+      A shader program is a way to render realistic material appearances on objects without having to have a high end gpu and use ray tracing. 
+      There are two different types of shaders that I implemented and that shader programs are built using: 
+      1) Vertex shader - which apply transforms to vertices so it can modify their geometric properties like position and normal vectors and it 
+      creates varying, which are variables that contain data shared from a vertex shader to a fragment shader. 
+      2) Fragment shader - After we finish rasterization, we get fragments which the shaders process. The geometric attributes of 
+      these fragments are calculated by using the varyings produced by the vertex shader and used by the shader to produce different material 
+      effects. 
+    </p>
+
+
+    <blockquote><b>
+    Explain the Blinn-Phong shading model in your own words. 
+    Show a screenshot of your Blinn-Phong shader outputting only the ambient component, a screen shot only outputting the diffuse component, a screen shot only outputting the specular component, and one using the entire Blinn-Phong model.
+    </b></blockquote>
+
+    <p>
+      Blinn-Phong shading is a model that takes in three different types of lighting: ambient light, diffuse light, and specular reflections. Ambient light is the light that is reflecting off uniformly off of all objects in the scene; 
+      Diffuse light is the function of the local surface normal relative to the illumination source; and Specular reflection uses the illumination source position, the surface normal, and the viewing position to produce there
+      glare characteristic of glossy materials.
+    </p>
+
+    <div align="middle">
+      <table style="width:100%">
+        <tr align="center">
+          <td>
+              <img src="images/hw4-part5-ambient1.png" align="middle" width="400px" />
+              <img src="images/hw4-part5-ambient2.png" align="middle" width="400px" />
+              <figcaption>Ambient component only</figcaption>
+          </td>
+          <td>
+              <img src="images/hw4-part5-diffuse1.png" align="middle" width="400px" />
+              <img src="images/hw4-part5-diffuse2.png" align="middle" width="400px" />
+              <figcaption>Diffuse component only</figcaption>
+          </td>
+        </tr>
+        <tr align="center">
+          <td>
+            <img src="images/hw4-part5-specular1.png" align="middle" width="400px" />
+            <img src="images/hw4-part5-specular2.png" align="middle" width="400px" />
+              <figcaption>Specular component only</figcaption>
+          </td>
+          <td>
+            <img src="images/hw4-part5-complete1.png" align="middle" width="400px" />
+            <img src="images/hw4-part5-complete2.png" align="middle" width="400px" />
+              <figcaption>Complete Blinn-Phong model</figcaption>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+      
+    <blockquote><b>
+    Show a screenshot of your texture mapping shader using your own custom texture by modifying the textures in <code>/textures/</code>.
+    </b></blockquote>
+
+    <div align="middle">
+      <img src="images/hw4-part5-custom-1.png" align="middle" width="100%" />
+      <img src="images/hw4-part5-custom-2.png" align="middle" width="100%" />
+      <figcaption>Custom image (I used "The Scream" but did not realize the photo was too big, hence it's hard to make it out)</figcaption>
+
+    </div>
+
+
+    <blockquote><b>
+    Show a screenshot of bump mapping on the cloth and on the sphere. 
+    Show a screenshot of displacement mapping on the sphere. 
+    Use the same texture for both renders. 
+    You can either provide your own texture or use one of the ones in the textures directory, 
+    BUT choose one that's not the default <code>texture_2.png</code>. 
+    Compare the two approaches and resulting renders in your own words. 
+    Compare how your the two shaders react to the sphere by changing the sphere mesh's coarseness by using <code>-o 16 -a 16</code> and then <code>-o 128 -a 128</code>.
+    </b></blockquote>
+
+    <div align="middle">
+      <table style="width:100%">
+        <tr align="center">
+          <td>
+            <img src="images/hw4-part5-bump-cloth-16.png" align="middle" width="400vw" />
+            <figcaption>Bump Mapping on the Cloth</figcaption>
+          </td>
+          <td>
+            <img src="images/hw4-part5-bump-sphere-16.png" align="middle" width="400vw" />
+            <figcaption>Bump Mapping on the Sphere</figcaption>
+          </td>
+          <td>
+        </tr>
+        <tr align="center">
+          <td>
+            <img src="images/hw4-part5-bump-sphere-16.png" align="middle" width="400vw" />
+            <figcaption>Bump mapping on sphere -o 16 -a 16</figcaption>
+          </td>
+          <td>
+            <img src="images/hw4-part5-displacementsphere-16.png" align="middle" width="400vw" />
+            <figcaption>displacement mapping on sphere -o 16 -a 16</figcaption>
+          </td>
+          <td>
+        </tr>
+        <tr align="center">
+          <td>
+            <img src="images/hw4-part5-bump-sphere-128.png" align="middle" width="400vw" />
+            <figcaption>Bump mapping on sphere -o 128 -a 128</figcaption>
+          </td>
+          <td>
+            <img src="images/hw4-part5-displacement-sphere-128.png" align="middle" width="400vw" />
+            <figcaption>displacement mapping on sphere -o 128 -a 128</figcaption>
+          </td>
+          <td>
+        </tr>
+      </table>
+    </div>
+
+    <p>
+      Here, we can see that by changing the sphere's coarseness, there is virtually no difference between the bump mappings. However, for displacement mapping,
+      with the higher resolution, the sphere looks rounder and closer to the original shape (so it is reducing displacement).
+    </p>
+
+
+    <blockquote><b>
+    Show a screenshot of your mirror shader on the cloth and on the sphere.
+    </b></blockquote>
+
+    <div align="middle">
+      <table style="width:100%">
+        <tr align="center">
+          <td>
+            <img src="images/hw4-part5-mirror-cloth.png" align="middle" width="400vw" />
+            <figcaption>Mirror Shader on the Cloth</figcaption>
+          </td>
+          <td>
+            <img src="images/hw4-part5-mirror-sphere.png" align="middle" width="400vw" />
+            <figcaption>Mirror Shader on the Sphere</figcaption>
+          </td>
+          <td>
+        </tr>
+      </table>
+    </div>
+</body>
 </html>
